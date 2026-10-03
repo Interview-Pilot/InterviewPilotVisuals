@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interviewpilot.app/schemas/visual-document-v1.schema.json",
+  "title": "Interview Pilot visual document v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contractVersion", "sourceAnswerHash", "visuals"],
+  "properties": {
+    "contractVersion": { "type": "integer", "const": 1 },
+    "sourceAnswerHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "visuals": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/chart" },
+          { "$ref": "#/$defs/diagram" }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      }
+    },
+    "chartPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "value"],
+      "properties": {
+        "label": { "type": "string" },
+        "value": { "type": "number" }
+      }
+    },
+    "chartSeries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "points"],
+      "properties": {
+        "name": { "type": "string" },
+        "points": { "type": "array", "items": { "$ref": "#/$defs/chartPoint" } }
+      }
+    },
+    "chart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind", "id", "title", "accessibilitySummary", "chartType",
+        "xAxisLabel", "yAxisLabel", "unit", "series"
+      ],
+      "properties": {
+        "kind": { "type": "string", "const": "chart" },
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "accessibilitySummary": { "type": "string" },
+        "chartType": { "type": "string", "enum": ["bar", "line"] },
+        "xAxisLabel": { "type": ["string", "null"] },
+        "yAxisLabel": { "type": ["string", "null"] },
+        "unit": { "type": ["string", "null"] },
+        "series": { "type": "array", "items": { "$ref": "#/$defs/chartSeries" } }
+      }
+    },
+    "diagramNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "x", "y", "width", "height"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number" },
+        "height": { "type": "number" }
+      }
+    },
+    "diagramEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source", "target", "label", "points"],
+      "properties": {
+        "id": { "type": "string" },
+        "source": { "type": "string" },
+        "target": { "type": "string" },
+        "label": { "type": ["string", "null"] },
+        "points": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/point" }
+        }
+      }
+    },
+    "diagram": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind", "id", "title", "accessibilitySummary", "diagramType",
+        "direction", "canvasWidth", "canvasHeight", "nodes", "edges"
+      ],
+      "properties": {
+        "kind": { "type": "string", "const": "diagram" },
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "accessibilitySummary": { "type": "string" },
+        "diagramType": { "type": "string", "enum": ["flow", "hierarchy", "sequence"] },
+        "direction": { "type": "string", "enum": ["topToBottom", "leftToRight"] },
+        "canvasWidth": { "type": "number" },
+        "canvasHeight": { "type": "number" },
+        "nodes": { "type": "array", "items": { "$ref": "#/$defs/diagramNode" } },
+        "edges": { "type": "array", "items": { "$ref": "#/$defs/diagramEdge" } }
+      }
+    }
+  }
+}

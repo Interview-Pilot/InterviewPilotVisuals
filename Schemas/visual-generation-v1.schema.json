@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interviewpilot.app/schemas/visual-generation-v1.schema.json",
+  "title": "Interview Pilot visual generation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["visuals"],
+  "properties": {
+    "visuals": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "anyOf": [
+          { "$ref": "#/$defs/chart" },
+          { "$ref": "#/$defs/diagram" }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "chartPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "value", "evidence"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "value": { "type": "number" },
+        "evidence": { "$ref": "#/$defs/evidence" }
+      }
+    },
+    "chartSeries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "points"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "points": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 24,
+          "items": { "$ref": "#/$defs/chartPoint" }
+        }
+      }
+    },
+    "chart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "title",
+        "accessibilitySummary",
+        "chartType",
+        "xAxisLabel",
+        "yAxisLabel",
+        "unit",
+        "series"
+      ],
+      "properties": {
+        "kind": { "type": "string", "enum": ["chart"] },
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "accessibilitySummary": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "chartType": { "type": "string", "enum": ["bar", "line"] },
+        "xAxisLabel": { "type": ["string", "null"], "maxLength": 80 },
+        "yAxisLabel": { "type": ["string", "null"], "maxLength": 80 },
+        "unit": { "type": ["string", "null"], "maxLength": 40 },
+        "series": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": { "$ref": "#/$defs/chartSeries" }
+        }
+      }
+    },
+    "diagramNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "evidence"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,31}$" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "evidence": { "$ref": "#/$defs/evidence" }
+      }
+    },
+    "diagramEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "target", "label", "order", "evidence"],
+      "properties": {
+        "source": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,31}$" },
+        "target": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,31}$" },
+        "label": { "type": ["string", "null"], "maxLength": 100 },
+        "order": { "type": "integer", "minimum": 0, "maximum": 99 },
+        "evidence": { "$ref": "#/$defs/evidence" }
+      }
+    },
+    "diagram": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "title",
+        "accessibilitySummary",
+        "diagramType",
+        "direction",
+        "nodes",
+        "edges"
+      ],
+      "properties": {
+        "kind": { "type": "string", "enum": ["diagram"] },
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "accessibilitySummary": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "diagramType": { "type": "string", "enum": ["flow", "hierarchy", "sequence"] },
+        "direction": { "type": "string", "enum": ["topToBottom", "leftToRight"] },
+        "nodes": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/diagramNode" }
+        },
+        "edges": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 24,
+          "items": { "$ref": "#/$defs/diagramEdge" }
+        }
+      }
+    }
+  }
+}
