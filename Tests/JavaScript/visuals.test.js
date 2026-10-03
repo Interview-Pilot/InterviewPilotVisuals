@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
     createVisualDocument,
     hashSourceAnswer,
+    visualGenerationProviderSchema,
     validateGeneratedVisuals,
     VisualValidationError
 } from '../../Sources/JavaScript/index.js';
@@ -112,6 +113,13 @@ test('lays out sequence messages in declared order', () => {
 
 test('accepts an empty result when no visual is justified', () => {
     assert.deepEqual(validateGeneratedVisuals({ visuals: [] }, sourceAnswer), { visuals: [] });
+});
+
+test('exposes a structured-output schema without document metadata', () => {
+    assert.equal(visualGenerationProviderSchema.type, 'object');
+    assert.equal('$schema' in visualGenerationProviderSchema, false);
+    assert.equal('$id' in visualGenerationProviderSchema, false);
+    assert.equal('title' in visualGenerationProviderSchema, false);
 });
 
 test('rejects evidence that is absent from the answer', () => {
