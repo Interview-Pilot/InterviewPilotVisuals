@@ -5,6 +5,7 @@ final class VisualModelsTests: XCTestCase {
     func testDecodesMixedVisualDocument() throws {
         let data = Data(json.utf8)
         let document = try JSONDecoder().decode(InterviewVisualDocument.self, from: data)
+        XCTAssertNoThrow(try document.validated())
 
         XCTAssertEqual(document.contractVersion, 1)
         XCTAssertEqual(document.visuals.count, 2)
@@ -17,6 +18,15 @@ final class VisualModelsTests: XCTestCase {
         }
         XCTAssertEqual(diagram.nodes.count, 2)
         XCTAssertEqual(diagram.edges[0].points.count, 2)
+    }
+
+    func testRejectsUnboundedGeometry() throws {
+        let document = try JSONDecoder().decode(
+            InterviewVisualDocument.self,
+            from: Data(json.replacingOccurrences(of: "\"canvasWidth\": 320", with: "\"canvasWidth\": 5000").utf8)
+        )
+
+        XCTAssertThrowsError(try document.validated())
     }
 
     func testRoundTripPreservesKinds() throws {

@@ -2,14 +2,14 @@ import Charts
 import SwiftUI
 
 public struct InterviewVisualsView: View {
-    private let document: InterviewVisualDocument
+    private let document: InterviewVisualDocument?
 
     public init(document: InterviewVisualDocument) {
-        self.document = document
+        self.document = try? document.validated()
     }
 
     public var body: some View {
-        if !document.visuals.isEmpty {
+        if let document, !document.visuals.isEmpty {
             VStack(spacing: 14) {
                 ForEach(document.visuals) { visual in
                     switch visual {
