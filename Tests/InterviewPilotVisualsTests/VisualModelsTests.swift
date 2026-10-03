@@ -51,6 +51,20 @@ final class VisualModelsTests: XCTestCase {
         )
     }
 
+    func testSourceHashAcceptsMatchingAnswer() throws {
+        let answer = "Answer"
+        let matchingJSON = json.replacingOccurrences(
+            of: String(repeating: "a", count: 64),
+            with: InterviewVisualSource.hash(answer)
+        )
+        let document = try JSONDecoder().decode(
+            InterviewVisualDocument.self,
+            from: Data(matchingJSON.utf8)
+        )
+
+        XCTAssertNoThrow(try document.validated(for: answer))
+    }
+
     private let json = #"""
     {
       "contractVersion": 1,
