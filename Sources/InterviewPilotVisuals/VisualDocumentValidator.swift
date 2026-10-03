@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 public enum InterviewVisualValidationError: Error, Equatable, Sendable {
@@ -6,6 +7,14 @@ public enum InterviewVisualValidationError: Error, Equatable, Sendable {
 }
 
 public extension InterviewVisualDocument {
+    func validated(for sourceAnswer: String) throws -> InterviewVisualDocument {
+        let document = try validated()
+        guard sourceAnswerHash == InterviewVisualSource.hash(sourceAnswer) else {
+            throw InterviewVisualValidationError.invalidDocument
+        }
+        return document
+    }
+
     func validated() throws -> InterviewVisualDocument {
         guard contractVersion == 1,
               sourceAnswerHash.count == 64,
@@ -144,5 +153,13 @@ public extension InterviewVisualDocument {
     private func isValidText(_ value: String, maximum: Int) -> Bool {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
         return !trimmed.isEmpty && trimmed.count <= maximum
+    }
+}
+
+public enum InterviewVisualSource {
+    public static func hash(_ sourceAnswer: String) -> String {
+        SHA256.hash(data: Data(sourceAnswer.utf8))
+            .map { String(format: "%02x", $0) }
+            .joined()
     }
 }

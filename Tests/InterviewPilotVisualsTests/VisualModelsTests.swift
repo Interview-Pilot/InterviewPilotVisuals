@@ -38,6 +38,19 @@ final class VisualModelsTests: XCTestCase {
         XCTAssertEqual(decoded, original)
     }
 
+    func testSourceHashRejectsMismatchedAnswer() throws {
+        let document = try JSONDecoder().decode(
+            InterviewVisualDocument.self,
+            from: Data(json.utf8)
+        )
+
+        XCTAssertThrowsError(try document.validated(for: "A different answer"))
+        XCTAssertEqual(
+            InterviewVisualSource.hash("Answer"),
+            "b2a3aa602762a782e47a4f8e93bb5ae1b8819d1b92b7e6ceb3ef46a3c7077eb0"
+        )
+    }
+
     private let json = #"""
     {
       "contractVersion": 1,
